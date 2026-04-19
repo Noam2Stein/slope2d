@@ -1,0 +1,13 @@
+[package]
+name = "testbed"
+edition = "2024"
+publish = false
+description = "A tiny framework for testing the engine"
+
+[dependencies]
+bytemuck = { workspace = true }
+ggmath = { workspace = true, features = ["bytemuck"] }
+pollster = { workspace = true }
+thunderdome = { workspace = true }
+wgpu = { workspace = true }
+winit = { workspace = true }

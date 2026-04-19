@@ -12,5 +12,20 @@ rust-version = "1.95.0"
 description = "A physics engine for unrealistic 2D platformers"
 
 [dependencies]
+ggmath = { workspace = true }
+thunderdome = { workspace = true }
+
+[dev-dependencies]
+testbed = { workspace = true }
+
+[workspace]
+members = [".", "testbed"]
+
+[workspace.dependencies]
+bytemuck = "1.25.0"
 ggmath = "0.16.7"
+pollster = "0.4.0"
 thunderdome = "0.6.1"
+wgpu = "29.0.1"
+winit = "0.30.13"
+testbed = { path = "testbed" }
