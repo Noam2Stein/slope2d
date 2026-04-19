@@ -1,0 +1,12 @@
+[package]
+name = "slope2d"
+version = "0.1.0"
+authors = ["Noam Stein <noamsteindev@proton.me>"]
+categories = ["game-development"]
+edition = "2024"
+keywords = ["physics", "2d"]
+license = "MIT OR Apache-2.0"
+publish = false
+repository = "https://github.com/noam2stein/slope2d"
+rust-version = "1.95.0"
+description = "A physics engine for unrealistic 2D platformers"
