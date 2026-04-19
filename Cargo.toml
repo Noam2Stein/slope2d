@@ -10,3 +10,7 @@ publish = false
 repository = "https://github.com/noam2stein/slope2d"
 rust-version = "1.95.0"
 description = "A physics engine for unrealistic 2D platformers"
+
+[dependencies]
+ggmath = "0.16.7"
+thunderdome = "0.6.1"
