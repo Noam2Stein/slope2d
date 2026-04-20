@@ -1,12 +1,12 @@
 use std::{collections::HashSet, mem::offset_of, sync::Arc, time::Instant};
 
 use bytemuck::{NoUninit, cast_slice};
-use ggmath::{Affine2, Vec2, Vec2U, Vec3, Vec4, Vec4U};
+use ggmath::{Affine2, Vec2, Vec2U, Vec3, Vec3U};
 use pollster::block_on;
 use wgpu::{
-    BlendState, Buffer, BufferUsages, Color, ColorTargetState, ColorWrites, CurrentSurfaceTexture,
-    Device, DeviceDescriptor, FragmentState, FrontFace, Instance, LoadOp, MultisampleState,
-    Operations, PipelineCompilationOptions, PolygonMode, PrimitiveState, PrimitiveTopology, Queue,
+    Buffer, BufferUsages, Color, ColorTargetState, ColorWrites, CurrentSurfaceTexture, Device,
+    DeviceDescriptor, FragmentState, FrontFace, Instance, LoadOp, MultisampleState, Operations,
+    PipelineCompilationOptions, PolygonMode, PrimitiveState, PrimitiveTopology, Queue,
     RenderPassColorAttachment, RenderPassDescriptor, RenderPipeline, RenderPipelineDescriptor,
     RequestAdapterOptions, StoreOp, Surface, SurfaceConfiguration, TextureViewDescriptor,
     VertexAttribute, VertexBufferLayout, VertexFormat, VertexState, VertexStepMode, include_wgsl,
@@ -84,18 +84,18 @@ impl<'a> Context<'a> {
 
     pub fn draw_rectangle(
         &mut self,
-        color: Vec4<f32>,
-        size: Vec2<f32>,
-        position: Vec2<f32>,
+        color: Vec3<f32>,
+        extents: Vec2<f32>,
+        center: Vec2<f32>,
         angle: f32,
     ) {
         let local_to_screen =
-            self.world_to_screen * Affine2::from_scale_angle_translation(size, angle, position);
+            self.world_to_screen * Affine2::from_scale_angle_translation(extents, angle, center);
 
-        let top_right = local_to_screen.transform_point(Vec2::new(0.5, 0.5));
-        let top_left = local_to_screen.transform_point(Vec2::new(-0.5, 0.5));
-        let bottom_right = local_to_screen.transform_point(Vec2::new(0.5, -0.5));
-        let bottom_left = local_to_screen.transform_point(Vec2::new(-0.5, -0.5));
+        let top_right = local_to_screen.transform_point(Vec2::new(1.0, 1.0));
+        let top_left = local_to_screen.transform_point(Vec2::new(-1.0, 1.0));
+        let bottom_right = local_to_screen.transform_point(Vec2::new(1.0, -1.0));
+        let bottom_left = local_to_screen.transform_point(Vec2::new(-1.0, -1.0));
 
         self.triangles.extend([
             Triangle {
@@ -133,7 +133,7 @@ struct Triangle {
     vertex_1: Vec2U<f32>,
     vertex_2: Vec2U<f32>,
     vertex_3: Vec2U<f32>,
-    color: Vec4U<f32>,
+    color: Vec3U<f32>,
 }
 
 struct Resources {
@@ -228,7 +228,7 @@ where
                             shader_location: 2,
                         },
                         VertexAttribute {
-                            format: VertexFormat::Float32x4,
+                            format: VertexFormat::Float32x3,
                             offset: offset_of!(Triangle, color) as u64,
                             shader_location: 3,
                         },
@@ -241,7 +241,7 @@ where
                 compilation_options: PipelineCompilationOptions::default(),
                 targets: &[Some(ColorTargetState {
                     format: surface_config.format,
-                    blend: Some(BlendState::ALPHA_BLENDING),
+                    blend: None,
                     write_mask: ColorWrites::all(),
                 })],
             }),

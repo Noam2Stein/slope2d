@@ -2,12 +2,12 @@ struct Triangle {
     vertex_1: vec2f,
     vertex_2: vec2f,
     vertex_3: vec2f,
-    color: vec4f,
+    color: vec3f,
 };
 
 struct Fragment {
     @builtin(position) position: vec4f,
-    @location(0) color: vec4f,
+    @location(0) color: vec3f,
 };
 
 @vertex
@@ -15,7 +15,7 @@ fn vs_main(
     @location(0) vertex_1: vec2f,
     @location(1) vertex_2: vec2f,
     @location(2) vertex_3: vec2f,
-    @location(3) color: vec4f,
+    @location(3) color: vec3f,
     @builtin(vertex_index) vertex_index: u32,
 ) -> Fragment {
     var vertex: vec2f;
@@ -39,5 +39,5 @@ fn vs_main(
 
 @fragment
 fn fs_main(in: Fragment) -> @location(0) vec4f {
-    return in.color;
+    return vec4f(in.color, 1.0);
 }

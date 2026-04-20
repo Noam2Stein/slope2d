@@ -1,4 +1,4 @@
-use ggmath::{Vec2, Vec4};
+use ggmath::{Vec2, Vec3};
 use slope2d::{Body, Collider, World};
 use testbed::{KeyCode, run};
 
@@ -41,13 +41,8 @@ fn main() {
         world.update();
 
         let player = world.get(player_id);
-        ctx.draw_rectangle(
-            Vec4::new(1.0, 0.0, 0.0, 1.0),
-            player.extents * 2.0,
-            player.center,
-            0.0,
-        );
+        ctx.draw_rectangle(Vec3::X, player.extents, player.center, 0.0);
         let collider = world.get(collider_id);
-        ctx.draw_rectangle(Vec4::W, collider.extents * 2.0, collider.center, 0.0);
+        ctx.draw_rectangle(Vec3::ZERO, collider.extents, collider.center, 0.0);
     });
 }
