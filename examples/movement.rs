@@ -5,12 +5,12 @@ use testbed::{KeyCode, run};
 fn main() {
     let mut world = World::new();
 
-    let player_id = world.create(Body {
+    let player_id = world.spawn(Body {
         extents: Vec2::splat(0.5),
         center: Vec2::ZERO,
         velocity: Vec2::ZERO,
     });
-    let collider_id = world.create(Collider {
+    let collider_id = world.spawn(Collider {
         extents: Vec2::new(3.0, 2.0),
         center: Vec2::new(6.0, 1.0),
     });

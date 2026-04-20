@@ -33,14 +33,14 @@ impl World {
         Self::default()
     }
 
-    pub fn create<T>(&mut self, object: T) -> Id<T>
+    pub fn spawn<T>(&mut self, object: T) -> Id<T>
     where
         T: Object,
     {
         Id(T::storage_mut(self).insert(object), PhantomData)
     }
 
-    pub fn remove<T>(&mut self, id: Id<T>)
+    pub fn despawn<T>(&mut self, id: Id<T>)
     where
         T: Object,
     {
