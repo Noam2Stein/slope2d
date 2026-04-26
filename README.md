@@ -6,7 +6,7 @@ I am currently experimenting on the engine's design.
 
 Todo list:
 
-- [ ] Proper collision
+- [x] Proper collision
 
 - [ ] Slopes
 
