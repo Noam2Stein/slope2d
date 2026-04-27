@@ -32,7 +32,7 @@ fn main() {
             } else {
                 0.0
             },
-        ) * 0.2;
+        ) * 0.15;
 
         if ctx.key_pressed(KeyCode::Space) {
             player.velocity.y = 1.0;

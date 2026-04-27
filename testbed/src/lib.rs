@@ -23,7 +23,7 @@ use winit::{
 pub use winit::keyboard::KeyCode;
 
 const MAX_TRIANGLES: usize = 1000;
-const TIME_STEP: f32 = 0.02;
+const TIME_STEP: f32 = 0.01;
 const DEFAULT_BACKGROUND_COLOR: Vec3<f32> = Vec3::new(0.05, 0.05, 0.2);
 
 pub fn run(update: impl FnMut(&mut Context)) {

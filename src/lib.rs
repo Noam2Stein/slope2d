@@ -73,7 +73,7 @@ impl World {
 
                 let collision = collider_min.x - body_max.x;
                 let collision_perp = body_delta.y * collision / body_delta.x;
-                if collision > -0.001
+                if collision > -0.01
                     && collision < body_delta.x
                     && ((collider_min.y..collider_max.y).contains(&(body_min.y + collision_perp))
                         || (collider_min.y..collider_max.y)
@@ -84,7 +84,7 @@ impl World {
 
                 let collision = collider_min.y - body_max.y;
                 let collision_perp = body_delta.x * collision / body_delta.y;
-                if collision > -0.001
+                if collision > -0.01
                     && collision < body_delta.y
                     && ((collider_min.x..collider_max.x).contains(&(body_min.x + collision_perp))
                         || (collider_min.x..collider_max.x)
@@ -95,7 +95,7 @@ impl World {
 
                 let collision = collider_max.x - body_min.x;
                 let collision_perp = body_delta.y * collision / body_delta.x;
-                if collision < 0.001
+                if collision < 0.01
                     && collision > body_delta.x
                     && ((collider_min.y..collider_max.y).contains(&(body_min.y + collision_perp))
                         || (collider_min.y..collider_max.y)
@@ -106,7 +106,7 @@ impl World {
 
                 let collision = collider_max.y - body_min.y;
                 let collision_perp = body_delta.x * collision / body_delta.y;
-                if collision < 0.001
+                if collision < 0.01
                     && collision > body_delta.y
                     && ((collider_min.x..collider_max.x).contains(&(body_min.x + collision_perp))
                         || (collider_min.x..collider_max.x)
