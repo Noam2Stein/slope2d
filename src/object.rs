@@ -1,6 +1,6 @@
 use thunderdome::Arena;
 
-use crate::{Body, Collider, World};
+use crate::{AabbCollider, Body, LineCollider, World};
 
 pub trait Object: Sized {
     fn storage(world: &World) -> &Arena<Self>;
@@ -18,12 +18,22 @@ impl Object for Body {
     }
 }
 
-impl Object for Collider {
+impl Object for AabbCollider {
     fn storage(world: &World) -> &Arena<Self> {
-        &world.colliders
+        &world.aabb_colliders
     }
 
     fn storage_mut(world: &mut World) -> &mut Arena<Self> {
-        &mut world.colliders
+        &mut world.aabb_colliders
+    }
+}
+
+impl Object for LineCollider {
+    fn storage(world: &World) -> &Arena<Self> {
+        &world.line_colliders
+    }
+
+    fn storage_mut(world: &mut World) -> &mut Arena<Self> {
+        &mut world.line_colliders
     }
 }

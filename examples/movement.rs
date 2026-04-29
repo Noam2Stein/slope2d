@@ -1,5 +1,5 @@
 use ggmath::{Vec2, Vec3};
-use slope2d::{Body, Collider, World};
+use slope2d::{AabbCollider, Body, LineCollider, World};
 use testbed::{KeyCode, run};
 
 fn main() {
@@ -10,9 +10,12 @@ fn main() {
         center: Vec2::ZERO,
         velocity: Vec2::ZERO,
     });
-    let collider_id = world.spawn(Collider {
+    let collider_id = world.spawn(AabbCollider {
         extents: Vec2::new(3.0, 2.0),
         center: Vec2::new(6.0, 1.0),
+    });
+    let line_id = world.spawn(LineCollider {
+        points: [Vec2::new(0.0, -5.0), Vec2::new(10.0, 1.0)],
     });
 
     run(|ctx| {
@@ -44,5 +47,7 @@ fn main() {
         ctx.draw_rectangle(Vec3::X, player.extents, player.center, 0.0);
         let collider = world.get(collider_id);
         ctx.draw_rectangle(Vec3::ZERO, collider.extents, collider.center, 0.0);
+        let line = world.get(line_id);
+        ctx.draw_line(Vec3::splat(0.1), line.points);
     });
 }

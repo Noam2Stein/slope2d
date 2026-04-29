@@ -112,6 +112,15 @@ impl<'a> Context<'a> {
             },
         ]);
     }
+
+    pub fn draw_line(&mut self, color: Vec3<f32>, points: [Vec2<f32>; 2]) {
+        self.draw_rectangle(
+            color,
+            Vec2::new(points[0].distance(points[1]) / 2.0, 0.1),
+            points[0].midpoint(points[1]),
+            (points[0].y - points[1].y).atan2(points[0].x - points[1].x),
+        );
+    }
 }
 
 struct Runner<UpdateFn> {
