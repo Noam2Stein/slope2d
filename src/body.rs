@@ -1,52 +1,33 @@
 use alloc::vec::Vec;
 use ggmath::Vec2;
 
-use crate::{Collider, Configuration};
+use crate::{Collider, Contact, Num};
 
-#[non_exhaustive]
-pub struct Body<Cfg>
+#[derive(Debug, Clone, Default)]
+pub struct Body<T, K>
 where
-    Cfg: Configuration,
+    T: Num,
 {
-    pub tag: Cfg::Tag,
-    pub colliders: Vec<Collider<Cfg>>,
-    pub position: Vec2<Cfg::Num>,
-    pub rotation: Vec2<Cfg::Num>,
-    pub velocity: Vec2<Cfg::Num>,
+    pub kind: K,
+    pub colliders: Vec<Collider<T>>,
+    pub position: Vec2<T>,
+    pub rotation: Vec2<T>,
+    pub velocity: Vec2<T>,
+    pub contacts: Vec<Contact<T>>,
 }
 
-impl<Cfg> Body<Cfg>
+impl<T, K> Body<T, K>
 where
-    Cfg: Configuration,
+    T: Num,
 {
-    pub fn new(
-        tag: Cfg::Tag,
-        colliders: impl IntoIterator<Item = Collider<Cfg>>,
-        position: Vec2<Cfg::Num>,
-        rotation: Vec2<Cfg::Num>,
-        velocity: Vec2<Cfg::Num>,
-    ) -> Self {
+    pub fn with_kind(kind: K) -> Self {
         Self {
-            tag,
-            colliders: Vec::from_iter(colliders),
-            position,
-            rotation,
-            velocity,
-        }
-    }
-}
-
-impl<Cfg> Clone for Body<Cfg>
-where
-    Cfg: Configuration,
-{
-    fn clone(&self) -> Self {
-        Self {
-            tag: self.tag,
-            colliders: self.colliders.clone(),
-            position: self.position,
-            rotation: self.rotation,
-            velocity: self.velocity,
+            kind,
+            colliders: Vec::new(),
+            position: Vec2::ZERO,
+            rotation: Vec2::X,
+            velocity: Vec2::ZERO,
+            contacts: Vec::new(),
         }
     }
 }

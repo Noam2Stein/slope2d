@@ -1,6 +1,6 @@
 # Slope2D
 
-A physics engine for unrealistic 2D platformers.
+A simple physics engine for 2D platformer games.
 
 I am currently experimenting on the engine's design.
 

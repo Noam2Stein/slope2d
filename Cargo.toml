@@ -9,7 +9,7 @@ license = "MIT OR Apache-2.0"
 publish = false
 repository = "https://github.com/noam2stein/slope2d"
 rust-version = "1.95.0"
-description = "A physics engine for unrealistic 2D platformers"
+description = "A simple physics engine for 2D platformer games"
 
 [dependencies]
 ggmath = { workspace = true }

@@ -3,11 +3,13 @@ use core::{
     ops::{Add, Div, Mul, Neg, Rem, Sub},
 };
 
-use ggmath::Scalar;
+use ggmath::{
+    Scalar,
+    constants::{NegOne, One, Zero},
+};
 
 pub trait Num:
-    Scalar
-    + Debug
+    Debug
     + PartialEq
     + PartialOrd
     + Default
@@ -17,6 +19,10 @@ pub trait Num:
     + Mul<Output = Self>
     + Div<Output = Self>
     + Rem<Output = Self>
+    + Scalar
+    + Zero
+    + One
+    + NegOne
 {
 }
 

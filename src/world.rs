@@ -1,23 +1,21 @@
-use core::{fmt::Debug, hash::Hash, marker::PhantomData};
-
 use thunderdome::{Arena, Index};
 
-use crate::{Body, Configuration};
+use crate::{Body, Interact, Num};
 
-pub struct World<Cfg>
+#[derive(Debug, Clone)]
+pub struct World<T, K>
 where
-    Cfg: Configuration,
+    T: Num,
 {
-    bodies: Arena<Body<Cfg>>,
+    bodies: Arena<Body<T, K>>,
 }
 
-pub struct BodyId<Cfg>(Index, PhantomData<Cfg>)
-where
-    Cfg: Configuration;
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct BodyId(Index);
 
-impl<Cfg> World<Cfg>
+impl<T, K> World<T, K>
 where
-    Cfg: Configuration,
+    T: Num,
 {
     pub fn new() -> Self {
         Self {
@@ -25,97 +23,49 @@ where
         }
     }
 
-    pub fn spawn(&mut self, body: Body<Cfg>) -> BodyId<Cfg> {
-        BodyId(self.bodies.insert(body), PhantomData)
+    pub fn spawn(&mut self, body: Body<T, K>) -> BodyId {
+        BodyId(self.bodies.insert(body))
     }
 
-    pub fn get(&self, body: BodyId<Cfg>) -> &Body<Cfg> {
+    pub fn get(&self, body: BodyId) -> &Body<T, K> {
         self.bodies.get(body.0).expect("body does not exist")
     }
 
-    pub fn get_mut(&mut self, body: BodyId<Cfg>) -> &mut Body<Cfg> {
+    pub fn get_mut(&mut self, body: BodyId) -> &mut Body<T, K> {
         self.bodies.get_mut(body.0).expect("body does not exist")
     }
 
-    pub fn try_get(&self, body: BodyId<Cfg>) -> Option<&Body<Cfg>> {
+    pub fn try_get(&self, body: BodyId) -> Option<&Body<T, K>> {
         self.bodies.get(body.0)
     }
 
-    pub fn try_get_mut(&mut self, body: BodyId<Cfg>) -> Option<&mut Body<Cfg>> {
+    pub fn try_get_mut(&mut self, body: BodyId) -> Option<&mut Body<T, K>> {
         self.bodies.get_mut(body.0)
     }
 
-    pub fn despawn(&mut self, body: BodyId<Cfg>) -> Body<Cfg> {
+    pub fn despawn(&mut self, body: BodyId) -> Body<T, K> {
         self.bodies.remove(body.0).expect("body does not exist")
     }
 
-    pub fn try_despawn(&mut self, body: BodyId<Cfg>) -> Option<Body<Cfg>> {
+    pub fn try_despawn(&mut self, body: BodyId) -> Option<Body<T, K>> {
         self.bodies.remove(body.0)
     }
 
-    pub fn update(&mut self) {
+    pub fn update(&mut self)
+    where
+        K: Interact,
+    {
         for (_, body) in &mut self.bodies {
             body.position += body.velocity;
         }
     }
 }
 
-impl<Cfg> Clone for World<Cfg>
+impl<T, Tag> Default for World<T, Tag>
 where
-    Cfg: Configuration,
-{
-    fn clone(&self) -> Self {
-        Self {
-            bodies: self.bodies.clone(),
-        }
-    }
-}
-
-impl<Cfg> Default for World<Cfg>
-where
-    Cfg: Configuration,
+    T: Num,
 {
     fn default() -> Self {
         Self::new()
-    }
-}
-
-impl<Cfg> Debug for BodyId<Cfg>
-where
-    Cfg: Configuration,
-{
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_tuple("BodyId").field(&self.0).finish()
-    }
-}
-
-impl<Cfg> Clone for BodyId<Cfg>
-where
-    Cfg: Configuration,
-{
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-impl<Cfg> Copy for BodyId<Cfg> where Cfg: Configuration {}
-
-impl<Cfg> PartialEq for BodyId<Cfg>
-where
-    Cfg: Configuration,
-{
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-
-impl<Cfg> Eq for BodyId<Cfg> where Cfg: Configuration {}
-
-impl<Cfg> Hash for BodyId<Cfg>
-where
-    Cfg: Configuration,
-{
-    fn hash<H: core::hash::Hasher>(&self, state: &mut H) {
-        self.0.hash(state);
     }
 }
