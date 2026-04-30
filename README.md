@@ -6,8 +6,8 @@ I am currently experimenting on the engine's design.
 
 Todo list:
 
-- [x] Proper collision
-- [x] Slopes
+- [ ] Proper collision
+- [ ] Slopes
 - [ ] Non sliding slopes
 - [ ] Stand from bottom middle on slopes
 - [ ] Specify "ground" direction
