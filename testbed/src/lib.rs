@@ -1,7 +1,7 @@
 use std::{collections::HashSet, mem::offset_of, sync::Arc, time::Instant};
 
 use bytemuck::{NoUninit, cast_slice};
-use ggmath::{Affine2, Vec2, Vec2U, Vec3, Vec3U};
+use ggmath::{Affine2A, Vec2, Vec2A, Vec3, Vec3A};
 use pollster::block_on;
 use wgpu::{
     Buffer, BufferUsages, Color, ColorTargetState, ColorWrites, CurrentSurfaceTexture, Device,
@@ -24,7 +24,7 @@ pub use winit::keyboard::KeyCode;
 
 const MAX_TRIANGLES: usize = 1000;
 const TIME_STEP: f32 = 0.01;
-const DEFAULT_BACKGROUND_COLOR: Vec3<f32> = Vec3::new(0.05, 0.05, 0.2);
+const DEFAULT_BACKGROUND_COLOR: Vec3A<f32> = Vec3A::new(0.05, 0.05, 0.2);
 
 pub fn run(update: impl FnMut(&mut Context)) {
     let event_loop = EventLoop::new().expect("failed to create event loop");
@@ -36,7 +36,7 @@ pub fn run(update: impl FnMut(&mut Context)) {
         last_instant: None,
         time_accumulator: 0.0,
         triangles: Vec::with_capacity(MAX_TRIANGLES),
-        camera_position: Vec2::ZERO,
+        camera_position: Vec2A::ZERO,
         camera_height: 16.0,
         background_color: DEFAULT_BACKGROUND_COLOR,
     };
@@ -47,11 +47,11 @@ pub struct Context<'a> {
     aspect_ratio: f32,
     held_keys: &'a HashSet<KeyCode>,
     previously_held_keys: &'a HashSet<KeyCode>,
-    camera_position: &'a mut Vec2<f32>,
+    camera_position: &'a mut Vec2A<f32>,
     camera_height: &'a mut f32,
-    background_color: &'a mut Vec3<f32>,
+    background_color: &'a mut Vec3A<f32>,
     triangles: &'a mut Vec<Triangle>,
-    world_to_screen: Affine2<f32>,
+    world_to_screen: Affine2A<f32>,
 }
 
 impl<'a> Context<'a> {
@@ -63,39 +63,39 @@ impl<'a> Context<'a> {
         self.held_keys.contains(&keycode) && !self.previously_held_keys.contains(&keycode)
     }
 
-    pub fn set_camera_position(&mut self, position: Vec2<f32>) {
+    pub fn set_camera_position(&mut self, position: Vec2A<f32>) {
         *self.camera_position = position;
-        self.world_to_screen = Affine2::from_scale(Vec2::new(
-            2.0 / *self.camera_height / self.aspect_ratio,
-            2.0 / *self.camera_height,
-        )) * Affine2::from_translation(-position);
+        self.world_to_screen = Affine2A::from_translation(-position)
+            * Affine2A::from_scale(Vec2A::new(
+                2.0 / *self.camera_height / self.aspect_ratio,
+                2.0 / *self.camera_height,
+            ));
     }
 
     pub fn set_camera_height(&mut self, height: f32) {
         *self.camera_height = height;
-        self.world_to_screen =
-            Affine2::from_scale(Vec2::new(2.0 / height / self.aspect_ratio, 2.0 / height))
-                * Affine2::from_translation(-*self.camera_position);
+        self.world_to_screen = Affine2A::from_translation(-*self.camera_position)
+            * Affine2A::from_scale(Vec2A::new(2.0 / height / self.aspect_ratio, 2.0 / height));
     }
 
-    pub fn set_background_color(&mut self, color: Vec3<f32>) {
+    pub fn set_background_color(&mut self, color: Vec3A<f32>) {
         *self.background_color = color;
     }
 
     pub fn draw_rectangle(
         &mut self,
-        color: Vec3<f32>,
-        extents: Vec2<f32>,
-        center: Vec2<f32>,
+        color: Vec3A<f32>,
+        extents: Vec2A<f32>,
+        center: Vec2A<f32>,
         angle: f32,
     ) {
         let local_to_screen =
-            self.world_to_screen * Affine2::from_scale_angle_translation(extents, angle, center);
+            Affine2A::from_scale_angle_translation(extents, angle, center) * self.world_to_screen;
 
-        let top_right = local_to_screen.transform_point(Vec2::new(1.0, 1.0));
-        let top_left = local_to_screen.transform_point(Vec2::new(-1.0, 1.0));
-        let bottom_right = local_to_screen.transform_point(Vec2::new(1.0, -1.0));
-        let bottom_left = local_to_screen.transform_point(Vec2::new(-1.0, -1.0));
+        let top_right = local_to_screen.transform_point(Vec2A::new(1.0, 1.0));
+        let top_left = local_to_screen.transform_point(Vec2A::new(-1.0, 1.0));
+        let bottom_right = local_to_screen.transform_point(Vec2A::new(1.0, -1.0));
+        let bottom_left = local_to_screen.transform_point(Vec2A::new(-1.0, -1.0));
 
         self.triangles.extend([
             Triangle {
@@ -113,10 +113,10 @@ impl<'a> Context<'a> {
         ]);
     }
 
-    pub fn draw_line(&mut self, color: Vec3<f32>, start: Vec2<f32>, end: Vec2<f32>) {
+    pub fn draw_line(&mut self, color: Vec3A<f32>, start: Vec2A<f32>, end: Vec2A<f32>) {
         self.draw_rectangle(
             color,
-            Vec2::new(start.distance(end) / 2.0, 0.1),
+            Vec2A::new(start.distance(end) / 2.0, 0.1),
             start.midpoint(end),
             (start.y - end.y).atan2(start.x - end.x),
         );
@@ -131,18 +131,18 @@ struct Runner<UpdateFn> {
     last_instant: Option<Instant>,
     time_accumulator: f32,
     triangles: Vec<Triangle>,
-    camera_position: Vec2<f32>,
+    camera_position: Vec2A<f32>,
     camera_height: f32,
-    background_color: Vec3<f32>,
+    background_color: Vec3A<f32>,
 }
 
 #[repr(C)]
 #[derive(Debug, Clone, Copy, NoUninit)]
 struct Triangle {
-    vertex_1: Vec2U<f32>,
-    vertex_2: Vec2U<f32>,
-    vertex_3: Vec2U<f32>,
-    color: Vec3U<f32>,
+    vertex_1: Vec2<f32>,
+    vertex_2: Vec2<f32>,
+    vertex_3: Vec2<f32>,
+    color: Vec3<f32>,
 }
 
 struct Resources {
@@ -217,7 +217,7 @@ where
                 module: &shader_module,
                 entry_point: None,
                 compilation_options: PipelineCompilationOptions::default(),
-                buffers: &[VertexBufferLayout {
+                buffers: &[Some(VertexBufferLayout {
                     array_stride: size_of::<Triangle>() as u64,
                     step_mode: VertexStepMode::Instance,
                     attributes: &[
@@ -242,7 +242,7 @@ where
                             shader_location: 3,
                         },
                     ],
-                }],
+                })],
             },
             fragment: Some(FragmentState {
                 module: &shader_module,
@@ -374,7 +374,7 @@ where
                 drop(pass);
                 queue.submit([encoder.finish()]);
 
-                surface_texture.present();
+                queue.present(surface_texture);
                 if reconfigure_surface {
                     surface.configure(device, surface_config);
                 }
@@ -417,10 +417,11 @@ where
             aspect_ratio,
             held_keys: &self.held_keys,
             previously_held_keys: &self.previously_held_keys,
-            world_to_screen: Affine2::from_scale(Vec2::new(
-                2.0 / self.camera_height / aspect_ratio,
-                2.0 / self.camera_height,
-            )) * Affine2::from_translation(-self.camera_position),
+            world_to_screen: Affine2A::from_translation(-self.camera_position)
+                * Affine2A::from_scale(Vec2A::new(
+                    2.0 / self.camera_height / aspect_ratio,
+                    2.0 / self.camera_height,
+                )),
             camera_position: &mut self.camera_position,
             camera_height: &mut self.camera_height,
             background_color: &mut self.background_color,
