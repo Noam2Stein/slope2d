@@ -1,0 +1,13 @@
+[package]
+name = "slope1d"
+edition = "2024"
+publish = false
+rust-version = "1.97.0"
+description = "A simpler 1-dimensional version of the engine"
+
+[dependencies]
+thunderdome = { workspace = true }
+
+[dev-dependencies]
+ggmath = { workspace = true }
+testbed = { workspace = true }
