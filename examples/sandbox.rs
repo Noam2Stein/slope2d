@@ -1,4 +1,4 @@
-use ggmath::{Vec2, Vec3A};
+use ggmath::{Vec2, Vec2A, Vec3A};
 use slope2d::{Body, physics_update};
 use testbed::{KeyCode, run};
 
@@ -6,20 +6,17 @@ fn main() {
     let mut bodies = vec![
         Body {
             id: 0,
-            extents: Vec2::new(0.5, 0.5),
             center: Vec2::ZERO,
             velocity: Vec2::ZERO,
         },
         Body {
             id: 1,
-            extents: Vec2::new(0.5, 0.5),
-            center: Vec2::new(3.0, -5.0),
+            center: Vec2::new(3.0, 0.0),
             velocity: Vec2::ZERO,
         },
         Body {
             id: 2,
-            extents: Vec2::new(0.5, 0.5),
-            center: Vec2::new(-3.0, -5.0),
+            center: Vec2::new(-3.0, 0.0),
             velocity: Vec2::ZERO,
         },
     ];
@@ -31,12 +28,6 @@ fn main() {
         }
         if ctx.key_held(KeyCode::ArrowLeft) {
             bodies[0].velocity.x -= 0.12;
-        }
-        if ctx.key_held(KeyCode::ArrowUp) {
-            bodies[0].velocity.y += 0.12;
-        }
-        if ctx.key_held(KeyCode::ArrowDown) {
-            bodies[0].velocity.y -= 0.12;
         }
 
         physics_update(&mut bodies, |a, b| match (a.id, b.id) {
@@ -55,7 +46,7 @@ fn main() {
                     _ => Vec3A::Y,
                 }
                 .midpoint(body.center.align().extend(0.0) * 0.1),
-                body.extents.align(),
+                Vec2A::splat(0.5),
                 body.center.align(),
                 0.0,
             );

@@ -9,7 +9,6 @@ extern crate alloc;
 #[derive(Debug)]
 pub struct Body {
     pub id: u32,
-    pub extents: Vec2<f32>,
     pub center: Vec2<f32>,
     pub velocity: Vec2<f32>,
 }
@@ -28,9 +27,7 @@ pub fn physics_update(bodies: &mut [Body], mut a_push_b_factor: impl FnMut(&Body
 
             let position_1_minus_2 = body_1.center - body_2.center;
             let position_abs_diff = position_1_minus_2.abs();
-            let colliding = position_abs_diff
-                .lt_mask(body_1.extents + body_2.extents)
-                .all();
+            let colliding = position_abs_diff.lt_mask(Vec2::ONE).all();
 
             if colliding {
                 let pushback_axis = if position_abs_diff.x > position_abs_diff.y {
@@ -42,9 +39,8 @@ pub fn physics_update(bodies: &mut [Body], mut a_push_b_factor: impl FnMut(&Body
                 let pushback_factor_2 = a_push_b_factor(body_1, body_2);
                 let pushback_factor_1 = 1.0 - pushback_factor_2;
 
-                let full_pushback_2 = position_1_minus_2.signum()
-                    * (position_abs_diff - body_1.extents - body_2.extents)
-                    * pushback_axis;
+                let full_pushback_2 =
+                    position_1_minus_2.signum() * (position_abs_diff - Vec2::ONE) * pushback_axis;
                 body_1.center -= full_pushback_2 * pushback_factor_1;
                 body_2.center += full_pushback_2 * pushback_factor_2;
             }
